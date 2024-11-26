@@ -25,6 +25,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
         synchronize: true
       }),
       inject: [ConfigService],  // Inject ConfigService into the factory
+      inject: [ConfigService],  // Inject ConfigService into the factory//
     }),
     AuthModule, 
     UserModule,

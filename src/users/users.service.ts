@@ -16,14 +16,15 @@ export class UserService {
   // Register user and hash password
   async createUser(createUserDto: CreateUserDto): Promise<User> {
     const { username, password, email } = createUserDto;
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const saltRounds = Number(process.env.BCRYPT_SALT_ROUNDS || 10); // Replace this with ConfigService if injected
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
     const user = this.userRepository.create({ username, password: hashedPassword, email });
     return this.userRepository.save(user);
   }
 
   // Find user by username
-  async findByUsername(username: string): Promise<User | undefined> {
-    return this.userRepository.findOne({ where: { username } });
+  async findByUsername(username: string): Promise<User | null> {
+    return this.userRepository.findOne({ where: { username } }); // Adjust this based on your ORM
   }
 
   // Find user by ID

@@ -18,9 +18,8 @@ export class AuthController {
 
   // Login endpoint
   @Post('login')
-  async login(@Body() loginUserDto: LoginUserDto) {
-    const { username, password } = loginUserDto;
-    return await this.authService.login(username, password); // Calls authService.login with username and password
+  async login(@Body() loginDto: { username: string; password: string }) {
+    return this.authService.login(loginDto.username, loginDto.password);
   }
 
   // Protected route: Fetch current user profile
