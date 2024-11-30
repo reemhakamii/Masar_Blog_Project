@@ -11,21 +11,21 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 
 @Module({
   imports: [
-    ConfigModule.forRoot(),  // Ensure this is loaded first
+    ConfigModule.forRoot(), 
     TypeOrmModule.forRootAsync({
-      imports: [ConfigModule], // Ensure ConfigModule is imported first
+      imports: [ConfigModule], 
       useFactory: async (configService: ConfigService) => ({
-        type: 'postgres', // Hardcoded for postgres, make sure to adjust this based on your DB
+        type: 'postgres', 
         host: configService.get('DB_HOST'),
-        port: configService.get('DB_PORT') || 8000, // Ensure the port is a number
+        port: configService.get('DB_PORT') || 8000, 
         username: configService.get('DB_USERNAME'),
         password: '',
         database: configService.get('DB_NAME'),
         entities: [__dirname + '/**/*.entity{.ts,.js}'],
-        synchronize: true
+        migrations: ['dist/migrations/*.js'],
+        synchronize: false
       }),
-      inject: [ConfigService],  // Inject ConfigService into the factory
-      inject: [ConfigService],  // Inject ConfigService into the factory//
+      inject: [ConfigService], 
     }),
     AuthModule, 
     UserModule,
