@@ -19,8 +19,8 @@ import { AuthController } from './auth.controller';
       }),
       inject: [ConfigService],
     }),
-    ConfigModule, // Add ConfigModule here
-    forwardRef(() => UserModule), // Handle circular dependency
+    ConfigModule, 
+    forwardRef(() => UserModule), 
   ],
   providers: [AuthService, JwtStrategy],
   controllers: [AuthController],

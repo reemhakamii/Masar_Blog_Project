@@ -9,7 +9,6 @@ import { User } from 'src/users/entities/user.entity';
 export class CommentController {
   constructor(private readonly commentService: CommentService) {}
 
-  // Create a comment for an article
   @Post('article/:articleId')
   async createComment(
     @Param('articleId') articleId: number,
@@ -20,7 +19,6 @@ export class CommentController {
     return this.commentService.create({ ...createCommentDto, articleId });
   }
 
-  // Get a single comment by ID
   @Get(':id')
   async getComment(@Param('id') id: number): Promise<Comment> {
     const comment = await this.commentService.findOne(id);
@@ -30,7 +28,6 @@ export class CommentController {
     return comment;
   }
 
-  // Get comments for an article, paginated and with search functionality
   @Get('article/:articleId')
   async getCommentsByArticle(
     @Param('articleId') articleId: number,

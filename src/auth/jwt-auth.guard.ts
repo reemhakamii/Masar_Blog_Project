@@ -1,7 +1,6 @@
 import { Injectable, ExecutionContext, UnauthorizedException } from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport'; // Import AuthGuard
-import { JwtService } from '@nestjs/jwt'; // Import JwtService
-
+import { AuthGuard } from '@nestjs/passport'; 
+import { JwtService } from '@nestjs/jwt'; 
 @Injectable()
 export class JwtAuthGuard extends AuthGuard('jwt') {
   constructor(private readonly jwtService: JwtService) {
@@ -20,7 +19,7 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
 
     try {
       const decoded = this.jwtService.verify(token);
-      request.user = decoded; // Attach user info to the request
+      request.user = decoded; 
       return true;
     } catch (error) {
       throw new UnauthorizedException('Invalid or expired token');

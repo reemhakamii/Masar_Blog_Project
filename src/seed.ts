@@ -19,6 +19,8 @@ async function seedDatabase() {
         });
         users.push(user);
 
+        
+
         await userRepository.save(users);
         await articleRepository.save(articles);
     }

@@ -3,14 +3,14 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { LikeService } from './likes.service';
 import { LikeController } from './likes.controller';
 import { Like } from './entities/like.entity';
-import { ArticleModule } from '../articles/articles.module'; // If you need ArticleService
-import { UserModule } from '../users/users.module'; // If you need UserService
+import { ArticleModule } from '../articles/articles.module'; 
+import { UserModule } from '../users/users.module'; 
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Like]), // Register Like entity
-    ArticleModule, // Import ArticleModule if ArticleService is required
-    UserModule, // Import UserModule if UserService is required
+    TypeOrmModule.forFeature([Like]),
+    ArticleModule, 
+    UserModule, 
   ],
   controllers: [LikeController],
   providers: [LikeService],

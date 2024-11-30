@@ -1,4 +1,4 @@
-import { Controller, Post, Body, UseGuards } from '@nestjs/common';
+import { Controller, Post, Body, UseGuards, HttpStatus, HttpCode } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
 import { LoginUserDto } from 'src/users/dto/login-user.dto';
@@ -10,20 +10,18 @@ import { User } from 'src/users/entities/user.entity';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  // Registration endpoint
   @Post('register')
   async register(@Body() createUserDto: CreateUserDto) {
     return await this.authService.register(createUserDto);  // Calls authService.register to create a new user
   }
 
-  // Login endpoint
   @Post('login')
+  @HttpCode(HttpStatus.OK) 
   async login(@Body() loginDto: { username: string; password: string }) {
     return this.authService.login(loginDto.username, loginDto.password);
   }
 
-  // Protected route: Fetch current user profile
-  @UseGuards(JwtAuthGuard) // Protect this route using JWT authentication
+  @UseGuards(JwtAuthGuard) 
   @Post('profile')
   getProfile(@CurrentUser() user: User) {
     return {

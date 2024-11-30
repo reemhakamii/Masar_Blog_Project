@@ -16,10 +16,12 @@ export class AuthService {
     private readonly configService: ConfigService,
   ) {}
 
-  // Register method to create a new user
-  async register(createUserDto: CreateUserDto) {
-    const { password, ...userData } = createUserDto;
-    const hashedPassword = await this.hashPassword(password); // Hash the password
+    async register(createUserDto: CreateUserDto) {
+        const saltRounds = this.configService.get<number>('BCRYPT_SALT_ROUNDS', 10);
+        console.log('Salt Rounds:', saltRounds);
+      const { password, ...userData } = createUserDto;
+      const hashedPassword = await this.hashPassword(password); // Hash the password
+      console.log('Hashed Password:', hashedPassword); // Log for debugging
     const user = await this.userService.createUser({
       ...userData,
       password: hashedPassword,
@@ -27,53 +29,53 @@ export class AuthService {
     return { message: 'User registered successfully', user };
   }
 
-  // Login method to generate JWT token
   async login(username: string, password: string) {
-    console.log("Attempting login with:", username, password);
-    try {
-      const user = await this.userService.findByUsername(username);
-      console.log("User fetched from DB:", user);
-      if (!user) {
-        throw new HttpException('User not found', HttpStatus.NOT_FOUND);
-      }
+    const user = await this.userService.findByUsername(username);
   
-      const isPasswordValid = await bcrypt.compare(password, user.password);
-      console.log("Password valid:", isPasswordValid);
-  
-      if (!isPasswordValid) {
-        throw new HttpException('Invalid password', HttpStatus.UNAUTHORIZED);
-      }
-  
-      const payload: JwtPayload = { sub: user.id, username: user.username };
-      const accessToken = this.jwtService.sign(payload);
-      console.log("JWT token generated:", accessToken);
-  
-      return { access_token: accessToken };
-    } catch (error) {
-      console.error("Login error:", error.message);
-      throw new HttpException('Internal Server Error', HttpStatus.INTERNAL_SERVER_ERROR);
+    if (!user) {
+      console.log('User not found:', username);
+      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
     }
+    const rehashedPassword = await bcrypt.hash(password, 10);
+    console.log('Input Password:', password);
+    console.log('Rehashed Input Password:', rehashedPassword);
+    console.log('Stored Hashed Password:', user.password);
+    console.log('Password Match:', await bcrypt.compare(password, user.password));
+
+  
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    console.log('Password Validation Result:', isPasswordValid);
+  
+    if (!isPasswordValid) {
+      throw new HttpException('Invalid password', HttpStatus.UNAUTHORIZED);
+    }
+  
+    const payload = { sub: user.id, username: user.username };
+    const accessToken = this.jwtService.sign(payload);
+  
+    console.log('Login Successful. JWT:', accessToken);
+  
+    return { 
+      message: 'Login successful', 
+      access_token: accessToken 
+    };
   }
 
-  // Hash password before storing it in DB
   async hashPassword(password: string): Promise<string> {
     const saltRounds = Number(this.configService.get<number>('BCRYPT_SALT_ROUNDS', 10));
     return bcrypt.hash(password, saltRounds);
   }
 
-  // Validate password during login
   async validatePassword(password: string, hashedPassword: string): Promise<boolean> {
     console.log("Validating password...");
     return bcrypt.compare(password, hashedPassword);
   }
 
-  // Generate JWT token for the user
   generateJWT(user: User): string {
     const payload: JwtPayload = { sub: user.id, username: user.username };
     return this.jwtService.sign(payload, { expiresIn: '1h' });
   }
 
-  // Verify the JWT token
   verifyJWT(token: string): any {
     return this.jwtService.verify(token);
   }

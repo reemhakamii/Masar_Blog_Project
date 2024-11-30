@@ -5,8 +5,8 @@ import {
     OneToMany,
     Index,
 } from 'typeorm';
-import { Article } from 'src/articles/entities/article.entity';
-  import { Comment } from 'src/comments/entities/comment.entity';
+import { Article } from '../../articles/entities/article.entity'; // relative path
+import { Comment } from 'src/comments/entities/comment.entity';
   import { Like } from 'src/likes/entities/like.entity';
   
   @Index(['username'])

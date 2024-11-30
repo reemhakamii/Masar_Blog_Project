@@ -1,10 +1,7 @@
-import { Controller, Post, Body, Get, UseGuards, Req } from '@nestjs/common';
+import { Controller, Post, Body, Get, UseGuards } from '@nestjs/common';
 import { UserService } from './users.service';
-import { AuthService } from 'src/auth/auth.service';
-import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
-import { CreateUserDto } from './dto/create-user.dto'; // Create a DTO for user registration
-import { LoginUserDto } from './dto/login-user.dto'; // DTO for login
-import { UpdateUserDto } from './dto/update-user.dto'; // Optional, for updating user info
+import { AuthService } from '../auth/auth.service';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 @Controller('users')
 export class UserController {
@@ -13,38 +10,46 @@ export class UserController {
     private readonly authService: AuthService,
   ) {}
 
-  // Register user
   @Post('register')
-  async register(@Body() createUserDto: CreateUserDto) {
-    const user = await this.userService.createUser(createUserDto);
+  async register(
+    @Body('username') username: string,
+    @Body('password') password: string,
+    @Body('email') email: string,
+  ) {
+    const user = await this.userService.createUser({
+      username,
+      password,
+      email,
+    });
     return { message: 'User registered successfully', user };
   }
 
-  // User login and JWT generation
   @Post('login')
-  async login(@Body() loginUserDto: LoginUserDto) {
-    const user = await this.userService.findByUsername(loginUserDto.username);
-    if (!user || !(await this.userService.validatePassword(loginUserDto.password, user.password))) {
+  async login(
+    @Body('username') username: string,
+    @Body('password') password: string,
+  ) {
+    const user = await this.userService.findByUsername(username);
+    if (!user) {
+      console.log('User not found');
       throw new Error('Invalid credentials');
     }
-
+  
+    const isPasswordValid = await this.userService.validatePassword(password, user.password);
+    console.log('Is password valid:', isPasswordValid);
+  
+    if (!isPasswordValid) {
+      console.log('Invalid password');
+      throw new Error('Invalid credentials');
+    }
+  
     const token = this.authService.generateJWT(user);
     return { message: 'Login successful', token };
   }
 
-  // Get profile info of authenticated user
   @UseGuards(JwtAuthGuard)
   @Get('profile')
-  async getProfile(@Req() req) {
-    const userId = req.user.id; // Get userId from the request (JWT token)
-    return this.userService.findById(userId);
-  }
-
-  // Optionally, an endpoint to update user info
-  @UseGuards(JwtAuthGuard)
-  @Post('update')
-  async updateUser(@Req() req, @Body() updateUserDto: UpdateUserDto) {
-    const userId = req.user.id;
-    return this.userService.updateUser(userId, updateUserDto);
+  async getProfile(@Body('id') id: number) {
+    return this.userService.findById(id);
   }
 }

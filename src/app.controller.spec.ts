@@ -1,11 +1,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import * as request from 'supertest';
-import { AppModule } from './app.module'; // Assuming you have this in the root directory
+import { AppModule } from './app.module'; 
 import { JwtService } from '@nestjs/jwt';
 import { AuthService } from './auth/auth.service';
 import { User } from 'src/users/entities/user.entity';
 
-// Mock the AuthService
 const mockAuthService = {
   register: jest.fn().mockResolvedValue({
     id: 1,
@@ -23,9 +22,9 @@ describe('AppController (e2e)', () => {
 
   beforeEach(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [AppModule], // Your main App module
+      imports: [AppModule], 
     })
-      .overrideProvider(AuthService) // Mock the AuthService
+      .overrideProvider(AuthService) 
       .useValue(mockAuthService)
       .compile();
 
@@ -38,7 +37,7 @@ describe('AppController (e2e)', () => {
       .post('/auth/register')
       .send({ username: 'testuser', email: 'test@example.com', password: 'password' });
 
-    expect(response.status).toBe(201); // Created status code
+    expect(response.status).toBe(201); 
     expect(response.body.username).toBe('testuser');
     expect(response.body.email).toBe('test@example.com');
   });
@@ -64,7 +63,7 @@ describe('AppController (e2e)', () => {
       .set('Authorization', `Bearer ${token}`)
       .send({ title: 'Test Article', body: 'This is a test article.' });
 
-    expect(response.status).toBe(201); // Created status
+    expect(response.status).toBe(201); 
     expect(response.body.article.title).toBe('Test Article');
   });
 
